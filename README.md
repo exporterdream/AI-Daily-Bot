@@ -54,7 +54,7 @@ cd ai-daily-bot
 
 ---
 
-# AI Daily Bot
+# AI Daily Bot — Automated AI News Digest Bot
 
 每日北京时间 **20:00** 自动抓取 YouTube / TechCrunch / Twitter 上的 AI 资讯，
 经 Groq LLM 翻译加工成中文日报，并同步发布到 **Twitter（线程）** 和
