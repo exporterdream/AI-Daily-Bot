@@ -170,6 +170,3 @@ python main.py
 | Twitter 403 | App 未开 **Read and write** 权限，或 Free 套餐 500/月 用尽 |
 | IG container 一直 ERROR | 图床 URL 不可达 / 图片格式非 JPG/PNG / IG 账号未切 Business |
 | 中文显示为方块 | workflow 没装 `fonts-noto-cjk`，检查日志中 apt-get 是否成功 |
-
-
-## 📁 Repository Structure
