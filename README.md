@@ -29,6 +29,29 @@
 | (Optional) Twitter API | Post tweet threads | $0.01/tweet, $5 prepaid |
 | (Optional) Instagram Graph API | Post image to feed | Free (Business account required) |
 
+
+---
+
+## 🚀 Deploy Your Own
+
+### 1. Register Free Accounts & Get API Keys
+
+| Service | Registration URL | Required Keys | Notes |
+|---------|----------------|---------------|-------|
+| Groq | [console.groq.com](https://console.groq.com) | `GROQ_API_KEY` | Free tier sufficient |
+| ImgBB | [api.imgbb.com](https://api.imgbb.com) | `IMGBB_API_KEY` | For image upload fallback |
+| Telegram | [BotFather](https://t.me/botfather) | `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` | **Recommended**, free |
+| Twitter (optional) | [developer.twitter.com](https://developer.twitter.com) | `X_API_KEY`, `X_API_SECRET`, `X_ACCESS_TOKEN`, `X_ACCESS_TOKEN_SECRET` | Requires $5 prepaid |
+| Instagram (optional) | [developers.facebook.com](https://developers.facebook.com) | `IG_ACCESS_TOKEN`, `IG_BUSINESS_ACCOUNT_ID` | Requires Business account + Facebook Page |
+
+> **Important**: Never hardcode keys. Use GitHub Secrets.
+
+### 2. Fork or Clone this Repository
+
+```bash
+git clone https://github.com/your-username/ai-daily-bot.git
+cd ai-daily-bot
+
 ---
 
 # AI Daily Bot
