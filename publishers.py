@@ -120,6 +120,106 @@ def _build_ig_caption(now) -> str:
     return cap[:2200]
 
 
+# ---------------------------------------------------------------- Instagram(ImgBB)
+# I hear catbox.moe not work, so uncommented this to used ImgBB for free image hosting
+# comment above
+
+# def publish_instagram(image_path: str, md_text: str, now) -> str:
+#     token = os.environ["IG_ACCESS_TOKEN"]
+#     ig_user = os.environ["IG_BUSINESS_ACCOUNT_ID"]
+
+#     image_url = _upload_image_to_public_host(image_path)
+#     print(f"   image hosted at: {image_url}")
+#     caption = _build_ig_caption(now)
+
+#     # Step 1: create container
+#     r1 = requests.post(
+#         f"{GRAPH}/{ig_user}/media",
+#         data={"image_url": image_url, "caption": caption, "access_token": token},
+#         timeout=60,
+#     )
+#     if not r1.ok:
+#         raise RuntimeError(f"create_media failed: {r1.status_code} {r1.text}")
+#     creation_id = r1.json()["id"]
+
+#     # Step 2: poll until FINISHED
+#     for _ in range(15):
+#         time.sleep(3)
+#         s = requests.get(
+#             f"{GRAPH}/{creation_id}",
+#             params={"fields": "status_code", "access_token": token},
+#             timeout=30,
+#         ).json()
+#         if s.get("status_code") == "FINISHED":
+#             break
+#         if s.get("status_code") == "ERROR":
+#             raise RuntimeError(f"container error: {s}")
+
+#     # Step 3: publish
+#     r3 = requests.post(
+#         f"{GRAPH}/{ig_user}/media_publish",
+#         data={"creation_id": creation_id, "access_token": token},
+#         timeout=60,
+#     )
+#     if not r3.ok:
+#         raise RuntimeError(f"media_publish failed: {r3.status_code} {r3.text}")
+#     media_id = r3.json().get("id")
+#     print(f"   instagram media_id={media_id}")
+#     return media_id
+
+
+# def _upload_image_to_public_host(path: str) -> str:
+#     """Upload image using imgbb API (free, requires IMGBB_API_KEY). Fallback to 0x0.st."""
+#     imgbb_key = os.environ.get("IMGBB_API_KEY")
+#     if imgbb_key:
+#         try:
+#             return _upload_to_imgbb(path, imgbb_key)
+#         except Exception as e:
+#             print(f"   imgbb upload failed: {e}, falling back to 0x0.st")
+#     # fallback 1: 0x0.st
+#     try:
+#         with open(path, "rb") as f:
+#             r = requests.post(
+#                 "https://0x0.st",
+#                 files={"file": f},
+#                 timeout=60,
+#             )
+#         if r.ok and r.text.strip().startswith("http"):
+#             return r.text.strip()
+#     except Exception as e:
+#         print(f"   0x0.st fallback error: {e}")
+
+#     raise RuntimeError("No working image host (imgbb not configured or failed, and 0x0.st also failed)")
+
+
+# def _upload_to_imgbb(path: str, api_key: str) -> str:
+#     """Upload to imgbb using API key, return direct image URL."""
+#     with open(path, "rb") as f:
+#         img_data = base64.b64encode(f.read()).decode()
+#     url = "https://api.imgbb.com/1/upload"
+#     payload = {
+#         "key": api_key,
+#         "image": img_data,
+#     }
+#     r = requests.post(url, data=payload, timeout=60)
+#     r.raise_for_status()
+#     json_resp = r.json()
+#     if not json_resp.get("success"):
+#         raise RuntimeError(f"imgbb returned error: {json_resp}")
+#     return json_resp["data"]["url"]
+
+
+# def _build_ig_caption(now) -> str:
+#     date_str = now.strftime("%Y.%m.%d")
+#     cap = (
+#         f"AI日报 · {date_str}\n\n"
+#         "今日聚焦：TechCrunch 头条 · X 舆论 · YouTube 焦点。\n"
+#         "完整深度日报详见个人主页链接。\n\n"
+#         "#AI #人工智能 #LLM #AIDaily #MachineLearning #大模型 #科技 #ChatGPT #AIGC #DeepLearning"
+#     )
+#     return cap[:2200]
+
+
 # =================================================================
 # === 付费平台扩展开始 ============================================
 # 以下平台默认未启用。需要付费认证或企业资质后取消注释并配置凭证。
