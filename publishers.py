@@ -5,9 +5,17 @@ import time
 import requests
 import tweepy
 
+XQUIK_API_BASE = "https://xquik.com/api/v1"
+
 
 # ---------------------------------------------------------------- Twitter
 def publish_twitter_thread(tweets: list) -> int:
+    if os.environ.get("TWITTER_BACKEND", "").lower() == "xquik":
+        return _publish_xquik_thread(tweets)
+    return _publish_tweepy_thread(tweets)
+
+
+def _publish_tweepy_thread(tweets: list) -> int:
     """Post tweets as a connected thread. Returns count successfully posted."""
     client = tweepy.Client(
         consumer_key=os.environ["X_API_KEY"],
@@ -32,6 +40,59 @@ def publish_twitter_thread(tweets: list) -> int:
     if posted == 0:
         raise RuntimeError("all thread tweets failed")
     return posted
+
+
+def _publish_xquik_thread(tweets: list) -> int:
+    """Post tweets through Xquik when TWITTER_BACKEND=xquik is set."""
+    api_key = _required_env("XQUIK_API_KEY")
+    account = _required_env("XQUIK_ACCOUNT")
+    api_base = os.environ.get("XQUIK_API_BASE", XQUIK_API_BASE).rstrip("/")
+    headers = {"x-api-key": api_key}
+
+    reply_to, posted = None, 0
+    for i, text in enumerate(tweets, 1):
+        try:
+            body = {"account": account, "text": text}
+            if reply_to:
+                body["reply_to_tweet_id"] = reply_to
+            resp = requests.post(
+                f"{api_base}/x/tweets",
+                json=body,
+                headers=headers,
+                timeout=60,
+            )
+            if not resp.ok:
+                raise RuntimeError(
+                    f"xquik tweet failed: {resp.status_code} {resp.text[:200]}"
+                )
+            reply_to = _xquik_tweet_id(resp.json())
+            posted += 1
+            suffix = f" id={reply_to}" if reply_to else ""
+            print(f"   tweet {i}/{len(tweets)} ok via xquik{suffix}")
+            if not reply_to and i < len(tweets):
+                print("   stopping thread: xquik response did not include tweetId")
+                break
+            time.sleep(2)
+        except Exception as e:
+            print(f"   tweet {i}/{len(tweets)} fail via xquik: {e}")
+    if posted == 0:
+        raise RuntimeError("all thread tweets failed")
+    return posted
+
+
+def _xquik_tweet_id(payload: dict):
+    for key in ("tweetId", "resultId", "tweet_id"):
+        value = payload.get(key)
+        if isinstance(value, str) and value:
+            return value
+    return None
+
+
+def _required_env(name: str) -> str:
+    value = os.environ.get(name)
+    if not value:
+        raise RuntimeError(f"missing required environment variable: {name}")
+    return value
 
 
 # ---------------------------------------------------------------- Instagram
